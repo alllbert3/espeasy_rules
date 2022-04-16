@@ -14,17 +14,8 @@ endon
 
 on Rules#Timer=1 do
     GPIO,14,0
-    Publish d1-mini-b/position, [arg#currentPosition]
-Endon
-
-//вниз
-on Clock#Time=All,22:25 do
-    GPIO,12,1 // направление вниз
-    Publish d1-mini-b/state, closing
-    timerset,1,[arg#maxTime]
-    TaskValueSet arg,1,0
-    GPIO,14,1 // питание моторов
-    TaskValueSet arg,4,%uptime_ms%
+    TaskValueSet arg,1,[blind#setPosition]
+    Publish d1-mini-b/position, [arg#currentPosition] //настроить вариант с работой по расписанию
 Endon
 
 on blind#setPosition do
@@ -35,7 +26,6 @@ on blind#setPosition do
         timerSet_ms,1,[arg#workTime]
         GPIO,14,1
         TaskValueSet arg,4,%uptime_ms%
-        TaskValueSet arg,1,[blind#setPosition]
     endif
     if [blind#setPosition]<[arg#currentPosition] //надо закрыть
         GPIO,12,1
@@ -44,12 +34,11 @@ on blind#setPosition do
         timerSet_ms,1,[arg#workTime]
         GPIO,14,1
         TaskValueSet arg,4,%uptime_ms%
-        TaskValueSet arg,1,[blind#setPosition]
     endif
-    if [blind#setPosition]=0 //надо закрыть полностью
-        Publish d1-mini-b/command, 101
-    endif
-    if [blind#setPosition]=100 //надо открыть полностью
-        Publish d1-mini-b/command, 100
-    endif
+//    if [blind#setPosition]=0 //надо закрыть полностью
+//        Publish d1-mini-b/command, 101
+//    endif
+//    if [blind#setPosition]=100 //надо открыть полностью
+//        Publish d1-mini-b/command, 100
+//    endif
 endon

@@ -21,3 +21,13 @@ on Clock#Time=All,09:30 do
         TaskValueSet arg,4,%uptime_ms%
     endif
 Endon
+
+//вниз ежедневно
+on Clock#Time=All,22:25 do
+    GPIO,12,1 // направление вниз
+    Publish d1-mini-b/state, closing
+    timerset,1,[arg#maxTime]
+    TaskValueSet arg,1,0
+    GPIO,14,1 // питание моторов
+    TaskValueSet arg,4,%uptime_ms%
+Endon
