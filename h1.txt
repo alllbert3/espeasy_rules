@@ -1,0 +1,57 @@
+// timer1 - время после отсутствия движения
+// timer2 - максимальное время для управления по интернету
+// 4,1 arg#status есть движение 1 или нет 0
+// 4,2 arg#time - время работы после отключения света
+// 4,3 arg#lux - порог светимости, >0 включено
+// mqtt 100 - выключен, 101 включен
+// pwm GPIO,16 D0 - 1 вкл, 0 выкл - светодиодная лента снизу
+// pwm2 GPIO,15 D8 - 1 вкл, 0 выкл - светодиодная лента сверху
+
+on System#Boot do
+  ResetPulseCounter
+  TaskValueSet arg,2,10
+  TaskValueSet arg,3,1
+endon
+
+//есть движения
+on pir#State=1 do
+  if [BH1750#Lux]<[arg#lux] and [arg#status]=0 // мало света и был выключен
+    pwm,16,1023,1000
+    pwm,15,1023,1000
+    Publish d1-mini-h/status/light,101
+    TaskValueSet arg,1,1
+
+    Let,2,[arg#time]*10
+    timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
+
+  endif
+  timerSet,1,0
+endon
+on pir2#State=1 do
+  if [BH1750#Lux]<[arg#lux] and [arg#status]=0 // мало света и был выключен
+    pwm,16,1023,1000
+    pwm,15,1023,1000
+    Publish d1-mini-h/status/light,101
+    TaskValueSet arg,1,1
+
+    Let,2,[arg#time]*10
+    timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
+
+  endif
+  timerSet,1,0
+endon
+on pir3#State=1 do
+  if [BH1750#Lux]<[arg#lux] and [arg#status]=0 // мало света и был выключен
+    pwm,16,1023,1000
+    pwm,15,1023,1000
+    Publish d1-mini-h/status/light,101
+    TaskValueSet arg,1,1
+
+    Let,2,[arg#time]*10
+    timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
+
+  endif
+  timerSet,1,0
+endon
+
+// продолжение во 2-м 

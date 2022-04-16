@@ -1,0 +1,16 @@
+// включение по http
+on start_vent do
+        GPIO,14,0
+        Publish nodemcu-t/status/vent,on
+        Let,2,[arg#time]*10
+        timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
+    endif
+endon 
+
+// выключение по http
+on stop_vent do
+        GPIO,14,1
+        Publish nodemcu-t/status/vent,off
+        timerSet,2,0
+    endif
+endon 

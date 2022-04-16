@@ -1,0 +1,60 @@
+// нет движения (могут быть пропуски)
+on pir#State=0 do
+  if [arg#status]=1 //  был включен
+    TaskValueSet arg,1,0
+  endif
+  timerSet,1,[arg#time]
+endon
+on pir2#State=0 do
+  if [arg#status]=1 //  был включен
+    TaskValueSet arg,1,0
+  endif
+  timerSet,1,[arg#time]
+endon
+on pir3#State=0 do
+  if [arg#status]=1 //  был включен
+    TaskValueSet arg,1,0
+  endif
+  timerSet,1,[arg#time]
+endon
+on gerkon#State=0 do
+  if [arg#status]=1 //  был включен
+    TaskValueSet arg,1,0
+  endif
+  timerSet,1,[arg#time]
+endon
+
+// давно не было движения
+on Rules#Timer=1 do
+    pwm,15,0,1000
+    pwm,16,0,1000
+    Publish d1-mini-h/status/light,100
+Endon
+
+// включение по mqtt
+on mqtt#light do
+    if [mqtt#light]=101 //включить
+        pwm,15,1023,1000
+        pwm,16,1023,1000
+        Let,2,[arg#time]*10
+        timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
+        Publish d1-mini-h/status/light,101
+    endif
+endon 
+
+// выключение по mqtt
+on mqtt#light do
+    if [mqtt#light]=100 //выключить
+        pwm,15,0,1000
+        pwm,16,0,1000
+        Publish d1-mini-h/status/light,100
+        timerSet,2,0
+    endif
+endon 
+
+//выключение по максимальному времени mqtt
+on Rules#Timer=2 do
+    pwm,15,0,1000
+    pwm,16,0,1000
+    Publish d1-mini-h/status/light,100
+Endon

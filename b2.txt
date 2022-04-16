@@ -1,0 +1,67 @@
+//вниз
+on Clock#Time=All,22:25 do
+    GPIO,12,1 // направление вниз
+    Publish d1-mini-b/state, closing
+    timerset,1,[arg#maxTime]
+    TaskValueSet arg,1,0
+    GPIO,14,1 // питание моторов
+    TaskValueSet arg,4,%uptime_ms%
+Endon
+
+//вверх в обычные дни
+on Clock#Time=All,07:25 do
+    if %sysweekday%!=1 and %sysweekday%!=7
+        GPIO,12,0 // направление вверх
+        Publish d1-mini-b/state, opening
+        timerset,1,[arg#maxTime]
+        TaskValueSet arg,1,100
+        GPIO,14,1
+        TaskValueSet arg,4,%uptime_ms%
+    endif
+Endon
+
+//вверх в выходные дни
+on Clock#Time=All,09:30 do
+    if %sysweekday%=1 or %sysweekday%=7
+        GPIO,12,0 // направление вверх
+        Publish d1-mini-b/state, opening
+        timerset,1,[arg#maxTime]
+        TaskValueSet arg,1,100
+        GPIO,14,1
+        TaskValueSet arg,4,%uptime_ms%
+    endif
+Endon
+
+on blind#command do
+    if [blind#command]=101 //вниз
+        GPIO,12,1
+        Publish d1-mini-b/state, closing
+        TaskValueSet arg,1,0
+        timerset,1,[arg#maxTime]
+        GPIO,14,1
+        TaskValueSet arg,4,%uptime_ms%
+    endif
+    if [blind#command]=100//вверх
+        GPIO,12,0
+        Publish d1-mini-b/state, opening
+        TaskValueSet arg,1,100
+        timerset,1,[arg#maxTime]
+        GPIO,14,1
+        TaskValueSet arg,4,%uptime_ms%
+    endif
+    if [blind#command]=102//стоп
+        timerset,1,0
+        GPIO,14,0
+        Publish d1-mini-b/state, stopped
+        Let,2,(%uptime_ms%-[arg#currentTime]-[arg#workTime])/1000 //сек, расчет разницы во времени
+        if [VAR#2]<0 //раньше времени
+            if [GPIO#12]=0
+                Let,3,([arg#currentPosition]-([arg#currentPosition]*([VAR#2]))/[arg#maxTime]) //расчет новой позиции
+                TaskValueSet arg,1,[VAR#3]
+            else
+                Let,4,([arg#currentPosition]+([arg#currentPosition]*([VAR#2]))/[arg#maxTime]) //расчет новой позиции
+                TaskValueSet arg,1,[VAR#4]
+            endif
+        endif
+    endif
+endon
