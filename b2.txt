@@ -1,3 +1,22 @@
+//arg,1 currentPosition (вычисляется)
+//arg,2 = 74 maxTime сек максимальное время
+//arg,3  workTime мсек разница по времени (вычисляется)
+//arg,4 currentTime мсек текущее время
+//GPIO,14 = мотор включен или выключен
+//GPIO,12 = 0 вверх, 1 вниз
+
+on System#Boot do
+  TaskValueSet arg,1,0
+  TaskValueSet arg,2,74
+  TaskValueSet arg,3,0
+  TaskValueSet arg,4,0
+endon
+
+on Rules#Timer=1 do
+    GPIO,14,0
+    Publish d1-mini-b/position, [arg#currentPosition]
+Endon
+
 //вниз
 on Clock#Time=All,22:25 do
     GPIO,12,1 // направление вниз
@@ -8,60 +27,29 @@ on Clock#Time=All,22:25 do
     TaskValueSet arg,4,%uptime_ms%
 Endon
 
-//вверх в обычные дни
-on Clock#Time=All,07:25 do
-    if %sysweekday%!=1 and %sysweekday%!=7
-        GPIO,12,0 // направление вверх
-        Publish d1-mini-b/state, opening
-        timerset,1,[arg#maxTime]
-        TaskValueSet arg,1,100
-        GPIO,14,1
-        TaskValueSet arg,4,%uptime_ms%
-    endif
-Endon
-
-//вверх в выходные дни
-on Clock#Time=All,09:30 do
-    if %sysweekday%=1 or %sysweekday%=7
-        GPIO,12,0 // направление вверх
-        Publish d1-mini-b/state, opening
-        timerset,1,[arg#maxTime]
-        TaskValueSet arg,1,100
-        GPIO,14,1
-        TaskValueSet arg,4,%uptime_ms%
-    endif
-Endon
-
-on blind#command do
-    if [blind#command]=101 //вниз
-        GPIO,12,1
-        Publish d1-mini-b/state, closing
-        TaskValueSet arg,1,0
-        timerset,1,[arg#maxTime]
-        GPIO,14,1
-        TaskValueSet arg,4,%uptime_ms%
-    endif
-    if [blind#command]=100//вверх
+on blind#setPosition do
+    if [blind#setPosition]>[arg#currentPosition] //надо открыть
         GPIO,12,0
-        Publish d1-mini-b/state, opening
-        TaskValueSet arg,1,100
-        timerset,1,[arg#maxTime]
+        Let,1,([blind#setPosition]-[arg#currentPosition])*[arg#maxTime]*10    //расчет времени
+        TaskValueSet arg,3,[VAR#1]
+        timerSet_ms,1,[arg#workTime]
         GPIO,14,1
         TaskValueSet arg,4,%uptime_ms%
+        TaskValueSet arg,1,[blind#setPosition]
     endif
-    if [blind#command]=102//стоп
-        timerset,1,0
-        GPIO,14,0
-        Publish d1-mini-b/state, stopped
-        Let,2,(%uptime_ms%-[arg#currentTime]-[arg#workTime])/1000 //сек, расчет разницы во времени
-        if [VAR#2]<0 //раньше времени
-            if [GPIO#12]=0
-                Let,3,([arg#currentPosition]-([arg#currentPosition]*([VAR#2]))/[arg#maxTime]) //расчет новой позиции
-                TaskValueSet arg,1,[VAR#3]
-            else
-                Let,4,([arg#currentPosition]+([arg#currentPosition]*([VAR#2]))/[arg#maxTime]) //расчет новой позиции
-                TaskValueSet arg,1,[VAR#4]
-            endif
-        endif
+    if [blind#setPosition]<[arg#currentPosition] //надо закрыть
+        GPIO,12,1
+        Let,1,([arg#currentPosition]-[blind#setPosition])*[arg#maxTime]*10    //расчет времени
+        TaskValueSet arg,3,[VAR#1]
+        timerSet_ms,1,[arg#workTime]
+        GPIO,14,1
+        TaskValueSet arg,4,%uptime_ms%
+        TaskValueSet arg,1,[blind#setPosition]
+    endif
+    if [blind#setPosition]=0 //надо закрыть полностью
+        Publish d1-mini-b/command, 101
+    endif
+    if [blind#setPosition]=100 //надо открыть полностью
+        Publish d1-mini-b/command, 100
     endif
 endon
