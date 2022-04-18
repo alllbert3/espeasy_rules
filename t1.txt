@@ -21,7 +21,7 @@ on Lux#Value>[arg#lux] do
         timerSet,1,0 // отключить таймер1
         TaskValueSet 3,1,1 // выставить флаг включения реле
         Publish nodemcu-t/status/light,on
-        Publish nodemcu-t/status/vent,on
+        Publish nodemcu-t/status/vent,101
     endif
 
     if [arg#isLong]=0
@@ -50,5 +50,3 @@ on Lux#Value<[arg#lux] do
         Publish nodemcu-t/status/light,off
     endif
 Endon
-
-// продолжение во 2-м
