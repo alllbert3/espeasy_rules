@@ -1,8 +1,8 @@
-on blind#command do
+n blind#command do
     if [blind#command]=101 //вниз
 //        GPIO,12,1
 //        Publish d1-mini-b/state, closing
-        Publish d1-mini-b/set_position, 0
+        TaskValueSet blind,2,0
 //        TaskValueSet arg,1,0
 //        timerset,1,[arg#maxTime]
 //        GPIO,14,1
@@ -11,7 +11,7 @@ on blind#command do
     if [blind#command]=100//вверх
 //        GPIO,12,0
 //        Publish d1-mini-b/state, opening
-        Publish d1-mini-b/set_position, 100
+        TaskValueSet blind,2,100
 //        TaskValueSet arg,1,100
 //        timerset,1,[arg#maxTime]
 //        GPIO,14,1
