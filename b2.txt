@@ -15,12 +15,19 @@ endon
 on Rules#Timer=1 do
     GPIO,14,0
     TaskValueSet arg,1,[blind#setPosition]
-    Publish d1-mini-b/position, [arg#currentPosition] //настроить вариант с работой по расписанию
+    Publish d1-mini-b/position, [arg#currentPosition]
+    if [blind#setPosition]=100
+        Publish d1-mini-b/state, open
+    endif
+    if [blind#setPosition]=0
+        Publish d1-mini-b/state, closed
+    endif
 Endon
 
 on blind#setPosition do
     if [blind#setPosition]>[arg#currentPosition] //надо открыть
         GPIO,12,0
+        Publish d1-mini-b/state, opening
         Let,1,([blind#setPosition]-[arg#currentPosition])*[arg#maxTime]*10    //расчет времени
         TaskValueSet arg,3,[VAR#1]
         timerSet_ms,1,[arg#workTime]
@@ -29,6 +36,7 @@ on blind#setPosition do
     endif
     if [blind#setPosition]<[arg#currentPosition] //надо закрыть
         GPIO,12,1
+        Publish d1-mini-b/state, closing
         Let,1,([arg#currentPosition]-[blind#setPosition])*[arg#maxTime]*10    //расчет времени
         TaskValueSet arg,3,[VAR#1]
         timerSet_ms,1,[arg#workTime]
