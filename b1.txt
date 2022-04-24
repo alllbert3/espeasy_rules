@@ -1,12 +1,12 @@
 //вверх в обычные дни
 on Clock#Time=All,07:25 do
     if %sysweekday%!=1 and %sysweekday%!=7
-        TaskValueSet blind,2,100
-//        GPIO,12,0 // направление вверх
-//        Publish d1-mini-b/state, opening
-//        timerset,1,[arg#maxTime]
-//        TaskValueSet arg,1,100
-//        GPIO,14,1
+//        TaskValueSet blind,2,100
+        GPIO,12,0 // направление вверх
+        Publish d1-mini-b/state, opening
+        timerset,1,[arg#maxTime]
+        TaskValueSet arg,1,100
+        GPIO,14,1
 //        TaskValueSet arg,4,%uptime_ms%
     endif
 Endon
@@ -14,23 +14,23 @@ Endon
 //вверх в выходные дни
 on Clock#Time=All,09:30 do
     if %sysweekday%=1 or %sysweekday%=7
-        TaskValueSet blind,2,100
-//        GPIO,12,0 // направление вверх
-//        Publish d1-mini-b/state, opening
-//        timerset,1,[arg#maxTime]
-//        TaskValueSet arg,1,100
-//        GPIO,14,1
+//        TaskValueSet blind,2,100
+        GPIO,12,0 // направление вверх
+        Publish d1-mini-b/state, opening
+        timerset,1,[arg#maxTime]
+        TaskValueSet arg,1,100
+        GPIO,14,1
 //        TaskValueSet arg,4,%uptime_ms%
     endif
 Endon
 
 //вниз ежедневно
 on Clock#Time=All,22:25 do
-    TaskValueSet blind,2,0
-//    GPIO,12,1 // направление вниз
-//    Publish d1-mini-b/state, closing
-//    timerset,1,[arg#maxTime]
-//    TaskValueSet arg,1,0
-//    GPIO,14,1 // питание моторов
+//    TaskValueSet blind,2,0
+    GPIO,12,1 // направление вниз
+    Publish d1-mini-b/state, closing
+    timerset,1,[arg#maxTime]
+    TaskValueSet arg,1,0
+    GPIO,14,1 // питание моторов
 //    TaskValueSet arg,4,%uptime_ms%
 Endon
