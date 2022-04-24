@@ -1,19 +1,19 @@
 // timer1 - время после отключения света
 // timer2 - максимальное время для управления по интернету
-// 5,1 arg#status включено реле (свет) 1 или нет 0
-// 5,2 arg#time 180, 720 - время работы после отключения света
-// 5,3 arg#lux - светимость >700 выкл, 559 вкл свет (500-800)
+// 5,1 arg#time 180, 720 - время работы после отключения света
+// 8,1 light#lux - светимость > 621 выкл
 // mqtt 100 - выключен, 101 включен
 // реле GPIO,14 - 1 выкл, 0 вкл инверсное
+// 801-1015 - выключено
+// 761-800 - только подсветка
+// 571-620 - только свет light#lux
+// 520-570 - свет + подсветка
+// подсветка < 571-760 < подсветка < 801
+// свет < 620
 
-On System#Boot do
-  TaskValueSet 5,2,120 //arg#time
-  TaskValueSet 5,3,700 //arg#lux
-Endon
-
-on Lux#Value<[arg#lux] do
-    if [arg#status]=0
-        TaskValueSet 5,1,1 // arg#status
+on Lux#Value<[light#lux] do
+    if [status#light]=0
+        TaskValueSet 7,1,1 // status#light
         timerSet,1,0
         timerSet,2,0
         Publish d1-mini-v/status/light,on
@@ -22,8 +22,8 @@ on Lux#Value<[arg#lux] do
     GPIO,14,0 // включить реле
 Endon
 
-on Lux#Value>[arg#lux] do
-    if [arg#status]=1
+on Lux#Value>[light#lux] do
+    if [status#light]=1
 
         if [SI7021#Humidity]>60
             Let,1,[arg#time]*4 
@@ -31,9 +31,8 @@ on Lux#Value>[arg#lux] do
         else
             timerSet,1,[arg#time]
         endif
-
-        TaskValueSet 5,1,0 // arg#status
         Publish d1-mini-v/status/light,off
+        TaskValueSet 7,1,0 // status#light
     endif
 Endon
 

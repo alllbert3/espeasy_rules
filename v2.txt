@@ -1,0 +1,29 @@
+// 801-1015 - выключено
+// 761-800 - только подсветка
+// 571-620 - только свет
+// 520-570 - свет + подсветка
+// подсветка < 571-760 < подсветка < 801
+// свет < 620
+
+On System#Boot do
+  TaskValueSet 5,1,180 //arg#time
+  TaskValueSet 8,1,621 //light#lux
+  TaskValueSet 8,2,801 //light#illum1
+  TaskValueSet 8,3,761 //light#illum2
+  TaskValueSet 8,4,570 //light#illum3
+Endon
+
+on Lux#Value do
+    if [Lux#Value]<801 
+        if [Lux#Value]<571 or [Lux#Value]>760
+            Publish d1-mini-v/status/backlight,on
+            TaskValueSet 7,2,1 // status#backlight - on
+        else
+            Publish d1-mini-v/status/backlight,off
+            TaskValueSet 7,2,0 // status#backlight - off
+        endif
+    else
+        Publish d1-mini-v/status/backlight,off
+        TaskValueSet 7,2,0 // status#backlight - off
+    endif
+Endon
