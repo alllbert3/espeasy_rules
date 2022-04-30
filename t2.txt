@@ -29,6 +29,7 @@ endon
 // выключение по максимальному таймеру
 on Rules#Timer=2 do
     GPIO,14,1
+    Publish d1-mini-v/command,100
     Publish nodemcu-t/status/vent,100
     timerSet,2,0
 endon
