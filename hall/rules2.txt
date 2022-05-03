@@ -34,8 +34,8 @@ Endon
 // включение по mqtt
 on mqtt#light do
     if [mqtt#light]=101 //включить
-        pwm,15,1023,1000
-        pwm,16,1023,1000
+        GPIO,16,1
+        GPIO,15,1
         Let,2,[arg#time]*10
         timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
         Publish d1-mini-h/status/light,101

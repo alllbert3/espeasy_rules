@@ -1,0 +1,13 @@
+on gerkon#State=1 do
+  if [BH1750#Lux]<[arg#lux] and [arg#status]=0 // мало света и был выключен
+    GPIO,16,1
+    GPIO,15,1
+    Publish d1-mini-h/status/light,101
+    TaskValueSet arg,1,1
+
+    Let,2,[arg#time]*10
+    timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
+
+  endif
+  timerSet,1,0
+endon

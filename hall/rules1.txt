@@ -2,7 +2,7 @@
 // timer2 - максимальное время для управления по интернету
 // 4,1 arg#status есть движение 1 или нет 0
 // 4,2 arg#time - время работы после отключения света
-// 4,3 arg#lux - порог светимости, >0 включено
+// 4,3 arg#lux - порог светимости, >3 включено
 // mqtt 100 - выключен, 101 включен
 // pwm GPIO,16 D0 - 1 вкл, 0 выкл - светодиодная лента снизу
 // pwm2 GPIO,15 D8 - 1 вкл, 0 выкл - светодиодная лента сверху
@@ -10,14 +10,14 @@
 on System#Boot do
   ResetPulseCounter
   TaskValueSet arg,2,10
-  TaskValueSet arg,3,1
+  TaskValueSet arg,3,3
 endon
 
 //есть движения
 on pir#State=1 do
   if [BH1750#Lux]<[arg#lux] and [arg#status]=0 // мало света и был выключен
-    pwm,16,1023,1000
-    pwm,15,1023,1000
+    GPIO,16,1
+    GPIO,15,1
     Publish d1-mini-h/status/light,101
     TaskValueSet arg,1,1
 
@@ -29,8 +29,8 @@ on pir#State=1 do
 endon
 on pir2#State=1 do
   if [BH1750#Lux]<[arg#lux] and [arg#status]=0 // мало света и был выключен
-    pwm,16,1023,1000
-    pwm,15,1023,1000
+    GPIO,16,1
+    GPIO,15,1
     Publish d1-mini-h/status/light,101
     TaskValueSet arg,1,1
 
@@ -42,8 +42,8 @@ on pir2#State=1 do
 endon
 on pir3#State=1 do
   if [BH1750#Lux]<[arg#lux] and [arg#status]=0 // мало света и был выключен
-    pwm,16,1023,1000
-    pwm,15,1023,1000
+    GPIO,16,1
+    GPIO,15,1
     Publish d1-mini-h/status/light,101
     TaskValueSet arg,1,1
 
