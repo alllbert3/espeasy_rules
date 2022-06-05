@@ -1,8 +1,9 @@
 // выключение по таймеру1
 on Rules#Timer=1 do
-    if [relay#vent]=100 // выключено по mqtt
+    if [relay#vent]<>101 //  не включено по mqtt
         GPIO,14,1
         Publish nodemcu-t/status/vent,100
+        Reboot
     endif
     TaskValueSet 3,1,0
 Endon
@@ -12,7 +13,7 @@ on relay#vent do
     if [relay#vent]=101 //включить
         GPIO,14,0
         Publish nodemcu-t/status/vent,101
-        Let,2,[arg#time]*10
+        Let,2,[arg#time]*2
         timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
     endif
 endon 
@@ -22,6 +23,7 @@ on relay#vent do
     if [relay#vent]=100 //выключить
         GPIO,14,1
         Publish nodemcu-t/status/vent,100
+        Reboot
         timerSet,2,0
     endif
 endon 
@@ -31,5 +33,7 @@ on Rules#Timer=2 do
     GPIO,14,1
     Publish nodemcu-t/command,100
     Publish nodemcu-t/status/vent,100
+    Reboot
     timerSet,2,0
 endon
+

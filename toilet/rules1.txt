@@ -11,6 +11,7 @@
 On System#Boot do    //When the ESP boots, do
    TaskValueSet 3,2,180
    TaskValueSet 3,4,20
+   TaskValueSet 3,3,0
 endon
 
 // включение реле по включению света
@@ -23,7 +24,6 @@ on Lux#Value>[arg#lux] do
         Publish nodemcu-t/status/light,on
         Publish nodemcu-t/status/vent,101
     endif
-
     if [arg#isLong]=0
         TaskValueSet 3,3,1 // выставить флаг запуска реле замера времени наличия света
         TimerSet,3,[arg#time]
