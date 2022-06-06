@@ -1,23 +1,27 @@
 // нет движения (могут быть пропуски)
 on pir#State=0 do
+  Publish d1-mini-h_7/pir/State,off
   if [arg#status]=1 //  был включен
     TaskValueSet arg,1,0
   endif
   timerSet,1,[arg#time]
 endon
 on pir2#State=0 do
+  Publish d1-mini-h_7/pir2/State,off
   if [arg#status]=1 //  был включен
     TaskValueSet arg,1,0
   endif
   timerSet,1,[arg#time]
 endon
 on pir3#State=0 do
+  Publish d1-mini-h_7/pir3/State,off
   if [arg#status]=1 //  был включен
     TaskValueSet arg,1,0
   endif
   timerSet,1,[arg#time]
 endon
 on gerkon#State=0 do
+  Publish d1-mini-h_7/gerkon/State,off
   if [arg#status]=1 //  был включен
     TaskValueSet arg,1,0
   endif
@@ -34,8 +38,8 @@ Endon
 // включение по mqtt
 on mqtt#light do
     if [mqtt#light]=101 //включить
-        GPIO,16,1
-        GPIO,15,1
+        pwm,16,1023
+        pwm,15,1023
         Let,2,[arg#time]*10
         timerSet,2,[VAR#2] // включение таймера максимального времени работы реле
         Publish d1-mini-h/status/light,101

@@ -1,7 +1,8 @@
 on gerkon#State=1 do
+  Publish d1-mini-h_7/gerkon/State,on
   if [BH1750#Lux]<[arg#lux] and [arg#status]=0 // мало света и был выключен
-    GPIO,16,1
-    GPIO,15,1
+    pwm 16,1,1023
+    pwm 15,1,1023
     Publish d1-mini-h/status/light,101
     TaskValueSet arg,1,1
 
